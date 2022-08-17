@@ -12,10 +12,10 @@ pub struct LinkDrop {
 }
 
 /// Access key allowance for linkdrop keys.
-const ACCESS_KEY_ALLOWANCE: u128 = 1_000_000_000_000_000_000_000_000;
+const ACCESS_KEY_ALLOWANCE: u128 = 1_000_000_000_000_000_000_000;
 
 /// Gas attached to the callback from account creation.
-pub const ON_CREATE_ACCOUNT_CALLBACK_GAS: Gas = Gas(20_000_000_000_000);
+pub const ON_CREATE_ACCOUNT_CALLBACK_GAS: Gas = Gas(20_000_000_000);
 
 /// Methods callable by the function call access key
 const ACCESS_KEY_METHOD_NAMES: &str = "claim,create_account_and_claim";
@@ -33,7 +33,7 @@ fn is_promise_success() -> bool {
     assert_eq!(
         env::promise_results_count(),
         1,
-        "Contract expected a result on the callback"
+        "Warning !! Contract expected a result on the callback"
     );
     match env::promise_result(0) {
         PromiseResult::Successful(_) => true,
@@ -57,7 +57,7 @@ impl LinkDrop {
     pub fn send(&mut self, public_key: PublicKey) -> Promise {
         assert!(
             env::attached_deposit() > ACCESS_KEY_ALLOWANCE,
-            "Attached deposit must be greater than ACCESS_KEY_ALLOWANCE"
+            "Warning !! Attached deposit must be greater than ACCESS_KEY_ALLOWANCE"
         );
         let pk = public_key.into();
         let value = self.accounts.get(&pk).unwrap_or(0);
@@ -78,11 +78,11 @@ impl LinkDrop {
         assert_eq!(
             env::predecessor_account_id(),
             env::current_account_id(),
-            "Claim only can come from this account"
+            "Warning !! Claim only can come from this account"
         );
         assert!(
             env::is_valid_account_id(account_id.as_bytes()),
-            "Invalid account id"
+            "Warning !! Invalid account id"
         );
         let amount = self
             .accounts
@@ -101,11 +101,11 @@ impl LinkDrop {
         assert_eq!(
             env::predecessor_account_id(),
             env::current_account_id(),
-            "Create account and claim only can come from this account"
+            "Warning !! Create account and claim only can come from this account"
         );
         assert!(
             env::is_valid_account_id(new_account_id.as_bytes()),
-            "Invalid account id"
+            "Warning !! Invalid account id"
         );
         let amount = self
             .accounts
@@ -131,7 +131,7 @@ impl LinkDrop {
     ) -> Promise {
         assert!(
             env::is_valid_account_id(new_account_id.as_bytes()),
-            "Invalid account id"
+            "Warning !! Invalid account id"
         );
         let amount = env::attached_deposit();
         Promise::new(new_account_id)
@@ -153,7 +153,7 @@ impl LinkDrop {
         assert_eq!(
             env::predecessor_account_id(),
             env::current_account_id(),
-            "Callback can only be called from the contract"
+            "Warning !! Callback can only be called from the contract"
         );
         let creation_succeeded = is_promise_success();
         if !creation_succeeded {
@@ -168,7 +168,7 @@ impl LinkDrop {
         assert_eq!(
             env::predecessor_account_id(),
             env::current_account_id(),
-            "Callback can only be called from the contract"
+            "Warning !! Callback can only be called from the contract"
         );
         let creation_succeeded = is_promise_success();
         if creation_succeeded {
@@ -212,7 +212,7 @@ mod tests {
             .parse()
             .unwrap();
         // Default the deposit to an extremely small amount
-        let deposit = 1_000_000;
+        let deposit = 100_000;
 
         // Initialize the mocked blockchain
         testing_env!(
@@ -236,7 +236,7 @@ mod tests {
             .parse()
             .unwrap();
         // Default the deposit to an extremely small amount
-        let deposit = 1_000_000;
+        let deposit = 100_000;
 
         // Initialize the mocked blockchain
         testing_env!(
